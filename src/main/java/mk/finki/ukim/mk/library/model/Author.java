@@ -26,4 +26,36 @@ public class Author {
         this.surname = surname;
         this.country = country;
     }
+
+//    public void setId(Long id) {
+//        Id = id;
+//    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public void setCountry(Country country) {
+        this.country = country;
+    }
+
+//    public Long getId() {
+//        return Id;
+//    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public Country getCountry() {
+        return country;
+    }
 }
