@@ -12,17 +12,24 @@ public class BookDto {
 
     private Long authorId;
 
-    private Integer availableCopies;
+//    private Integer availableCopies;
 
     public BookDto() {
     }
 
-    public BookDto(String name, Category category, Long authorId, Integer availableCopies) {
+    public BookDto(String name, Category category, Long authorId) {
         this.name = name;
         this.category = category;
         this.authorId = authorId;
-        this.availableCopies = availableCopies;
     }
+
+
+    //    public BookDto(String name, Category category, Long authorId, Integer availableCopies) {
+//        this.name = name;
+//        this.category = category;
+//        this.authorId = authorId;
+//        this.availableCopies = availableCopies;
+//    }
 
 //    public void setName(String name) {
 //        this.name = name;
@@ -52,7 +59,7 @@ public class BookDto {
         return authorId;
     }
 
-    public Integer getAvailableCopies() {
-        return availableCopies;
-    }
+//    public Integer getAvailableCopies() {
+//        return availableCopies;
+//    }
 }

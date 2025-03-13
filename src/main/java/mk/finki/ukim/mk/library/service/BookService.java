@@ -20,7 +20,9 @@ public interface BookService {
     void deleteById(Long id);
 
     // Additional method to mark a book as borrowed (decrease available copies)
-    Optional<Book> markAsBorrowed(Long id);
+//    Optional<Book> markAsBorrowed(Long id);
+
+    Integer getAvailableCopies(Long bookId);
 
     // Additional method to get all categories
     List<Category> findAllCategories();

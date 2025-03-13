@@ -3,6 +3,9 @@ package mk.finki.ukim.mk.library.model;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Data
 @Entity
 public class Book {
@@ -19,16 +22,32 @@ public class Book {
     @ManyToOne
     private Author author;
 
-    private Integer availableCopies;
+//    private Integer availableCopies;
+
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    private List<BookCopy> copies = new ArrayList<BookCopy>();
 
     public Book() {
+    }
+
+    public Book(String name, Category category, Author author, List<BookCopy> copies) {
+        this.name = name;
+        this.category = category;
+        this.author = author;
+        this.copies = copies;
     }
 
     public Book(String name, Category category, Author author, Integer availableCopies) {
         this.name = name;
         this.category = category;
         this.author = author;
-        this.availableCopies = availableCopies;
+//        this.availableCopies = availableCopies;
+    }
+
+    public Book(String name, Category category, Author author) {
+        this.name = name;
+        this.category = category;
+        this.author = author;
     }
 
 //    public void setId(Long id) {
@@ -47,9 +66,9 @@ public class Book {
         this.author = author;
     }
 
-    public void setAvailableCopies(Integer availableCopies) {
-        this.availableCopies = availableCopies;
-    }
+//    public void setAvailableCopies(Integer availableCopies) {
+//        this.availableCopies = availableCopies;
+//    }
 
 //    public Long getId() {
 //        return id;
@@ -67,7 +86,7 @@ public class Book {
         return author;
     }
 
-    public Integer getAvailableCopies() {
-        return availableCopies;
-    }
+//    public Integer getAvailableCopies() {
+//        return availableCopies;
+//    }
 }

@@ -54,15 +54,16 @@ public class BookController {
         return ResponseEntity.notFound().build();
     }
 
-    @PutMapping("/mark-as-borrowed/{id}")
-    public ResponseEntity<Book> markAsBorrowed(@PathVariable Long id) {
-        return bookService.markAsBorrowed(id)
-                .map(book -> ResponseEntity.ok().body(book))
-                .orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
     @GetMapping("/categories")
     public List<Category> findAllCategories() {
         return bookService.findAllCategories();
+    }
+
+    @GetMapping("/{id}/available-copies")
+    public ResponseEntity<Integer> getAvailableCopies(@PathVariable Long id) {
+        if (bookService.findById(id).isPresent()) {
+            return ResponseEntity.ok(bookService.getAvailableCopies(id));
+        }
+        return ResponseEntity.notFound().build();
     }
 }

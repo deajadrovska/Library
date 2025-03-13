@@ -7,6 +7,7 @@ import mk.finki.ukim.mk.library.model.Category;
 import mk.finki.ukim.mk.library.model.Dto.BookDto;
 import mk.finki.ukim.mk.library.repository.BookRepository;
 import mk.finki.ukim.mk.library.service.AuthorService;
+import mk.finki.ukim.mk.library.service.BookCopyService;
 import mk.finki.ukim.mk.library.service.BookService;
 import mk.finki.ukim.mk.library.service.CountryService;
 import org.springframework.stereotype.Service;
@@ -21,11 +22,13 @@ public class BookServiceImpl implements BookService {
      private final BookRepository bookRepository;
      private final AuthorService authorService;
      private final CountryService countryService;
+    private final BookCopyService bookCopyService;
 
-    public BookServiceImpl(BookRepository bookRepository, AuthorService authorService, CountryService countryService) {
+    public BookServiceImpl(BookRepository bookRepository, AuthorService authorService, CountryService countryService, BookCopyService bookCopyService) {
         this.bookRepository = bookRepository;
         this.authorService = authorService;
         this.countryService = countryService;
+        this.bookCopyService = bookCopyService;
     }
 
     @Override
@@ -40,15 +43,12 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public Optional<Book> save(BookDto bookDto) {
-        if (bookDto.getAuthorId() != null && authorService.findById(bookDto.getAuthorId()).isPresent()) {
-            Author author = authorService.findById(bookDto.getAuthorId()).get();
-            Book book = new Book(
-                    bookDto.getName(),
-                    bookDto.getCategory(),
-                    author,
-                    bookDto.getAvailableCopies()
-            );
-            return Optional.of(bookRepository.save(book));
+        if (bookDto.getAuthorId() != null) {
+            return authorService.findById(bookDto.getAuthorId())
+                    .map(author -> {
+                        Book book = new Book(bookDto.getName(), bookDto.getCategory(), author);
+                        return bookRepository.save(book);
+                    });
         }
         return Optional.empty();
     }
@@ -62,9 +62,6 @@ public class BookServiceImpl implements BookService {
                     }
                     if (bookDto.getCategory() != null) {
                         existingBook.setCategory(bookDto.getCategory());
-                    }
-                    if (bookDto.getAvailableCopies() != null) {
-                        existingBook.setAvailableCopies(bookDto.getAvailableCopies());
                     }
                     if (bookDto.getAuthorId() != null) {
                         authorService.findById(bookDto.getAuthorId())
@@ -80,19 +77,12 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Optional<Book> markAsBorrowed(Long id) {
-        return bookRepository.findById(id)
-                .map(book -> {
-                    if (book.getAvailableCopies() > 0) {
-                        book.setAvailableCopies(book.getAvailableCopies() - 1);
-                        return bookRepository.save(book);
-                    }
-                    return book;
-                });
+    public List<Category> findAllCategories() {
+        return Arrays.asList(Category.values());
     }
 
     @Override
-    public List<Category> findAllCategories() {
-        return Arrays.asList(Category.values());
+    public Integer getAvailableCopies(Long bookId) {
+        return bookCopyService.findAvailableCopiesByBookId(bookId).size();
     }
 }
