@@ -18,6 +18,7 @@ public interface BookService {
     Optional<Book> update(Long id, BookDto bookDto);
 
     void deleteById(Long id);
+    void softDeleteById(Long id);
 
     // Additional method to mark a book as borrowed (decrease available copies)
     Optional<Book> markAsBorrowed(Long id);

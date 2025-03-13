@@ -30,12 +30,12 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public List<Book> findAll() {
-        return bookRepository.findAll();
+        return bookRepository.findByDeletedFalse();
     }
 
     @Override
     public Optional<Book> findById(Long id) {
-        return bookRepository.findById(id);
+        return bookRepository.findByIdAndDeletedFalse(id);
     }
 
     @Override
@@ -46,7 +46,8 @@ public class BookServiceImpl implements BookService {
                     bookDto.getName(),
                     bookDto.getCategory(),
                     author,
-                    bookDto.getAvailableCopies()
+                    bookDto.getAvailableCopies(),
+                    bookDto.isDeleted()
             );
             return Optional.of(bookRepository.save(book));
         }
@@ -70,6 +71,9 @@ public class BookServiceImpl implements BookService {
                         authorService.findById(bookDto.getAuthorId())
                                 .ifPresent(existingBook::setAuthor);
                     }
+                    if(!bookDto.isDeleted()){
+                        existingBook.setDeleted(false);
+                    }
                     return bookRepository.save(existingBook);
                 });
     }
@@ -77,6 +81,14 @@ public class BookServiceImpl implements BookService {
     @Override
     public void deleteById(Long id) {
         bookRepository.deleteById(id);
+    }
+
+    @Override
+    public void softDeleteById(Long id) {
+        bookRepository.findById(id).ifPresent(book -> {
+            book.setDeleted(true);
+            bookRepository.save(book);
+        });
     }
 
     @Override

@@ -14,6 +14,14 @@ public class BookDto {
 
     private Integer availableCopies;
 
+    private boolean deleted = false;
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+
+
     public BookDto() {
     }
 

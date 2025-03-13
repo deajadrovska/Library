@@ -48,7 +48,7 @@ public class BookController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         if (bookService.findById(id).isPresent()) {
-            bookService.deleteById(id);
+            bookService.softDeleteById(id);
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();

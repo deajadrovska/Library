@@ -21,7 +21,25 @@ public class Book {
 
     private Integer availableCopies;
 
+    private boolean deleted = false;
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
     public Book() {
+    }
+
+    public Book(String name, Category category, Author author, Integer availableCopies, boolean deleted) {
+        this.name = name;
+        this.category = category;
+        this.author = author;
+        this.availableCopies = availableCopies;
+        this.deleted = deleted;
     }
 
     public Book(String name, Category category, Author author, Integer availableCopies) {
