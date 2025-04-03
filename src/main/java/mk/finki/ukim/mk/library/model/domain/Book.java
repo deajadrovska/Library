@@ -1,4 +1,4 @@
-package mk.finki.ukim.mk.library.model;
+package mk.finki.ukim.mk.library.model.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -31,9 +31,9 @@ public class Book {
         this.availableCopies = availableCopies;
     }
 
-//    public void setId(Long id) {
-//        this.id = id;
-//    }
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -51,9 +51,9 @@ public class Book {
         this.availableCopies = availableCopies;
     }
 
-//    public Long getId() {
-//        return id;
-//    }
+    public Long getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
