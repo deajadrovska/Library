@@ -2,6 +2,7 @@ package mk.finki.ukim.mk.library.service.application.Impl;
 
 import mk.finki.ukim.mk.library.model.Dto.CreateBookDto;
 import mk.finki.ukim.mk.library.model.Dto.DisplayBookDto;
+import mk.finki.ukim.mk.library.model.Dto.DisplayBookHistoryDto;
 import mk.finki.ukim.mk.library.model.domain.Book;
 import mk.finki.ukim.mk.library.model.domain.Category;
 import mk.finki.ukim.mk.library.service.application.BookApplicationService;
@@ -38,24 +39,24 @@ public class BookApplicationServiceImpl implements BookApplicationService {
     }
 
     @Override
-    public Optional<DisplayBookDto> save(CreateBookDto bookDto) {
+    public Optional<DisplayBookDto> save(CreateBookDto bookDto, String username) {
         return authorService.findById(bookDto.authorId())
                 .map(author -> {
                     Book book = bookDto.toBook(author);
-                    return bookService.save(book);
+                    return bookService.save(book, username);
                 })
                 .orElse(Optional.empty())
                 .map(DisplayBookDto::from);
     }
 
     @Override
-    public Optional<DisplayBookDto> update(Long id, CreateBookDto bookDto) {
+    public Optional<DisplayBookDto> update(Long id, CreateBookDto bookDto, String username) {
         return bookService.findById(id)
                 .flatMap(existingBook -> authorService.findById(bookDto.authorId())
                         .map(author -> {
                             Book book = bookDto.toBook(author);
                             book.setId(id);
-                            return bookService.update(book);
+                            return bookService.update(book, username);
                         })
                         .orElse(Optional.empty())
                 )
@@ -76,5 +77,10 @@ public class BookApplicationServiceImpl implements BookApplicationService {
     @Override
     public List<Category> findAllCategories() {
         return bookService.findAllCategories();
+    }
+
+    @Override
+    public List<DisplayBookHistoryDto> getBookHistory(Long bookId) {
+        return DisplayBookHistoryDto.from(bookService.getBookHistory(bookId));
     }
 }

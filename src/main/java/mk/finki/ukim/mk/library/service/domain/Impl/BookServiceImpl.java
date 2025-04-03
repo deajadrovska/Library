@@ -1,14 +1,13 @@
 package mk.finki.ukim.mk.library.service.domain.Impl;
 
 
-import mk.finki.ukim.mk.library.model.domain.Author;
-import mk.finki.ukim.mk.library.model.domain.Book;
-import mk.finki.ukim.mk.library.model.domain.Category;
+import mk.finki.ukim.mk.library.model.domain.*;
+import mk.finki.ukim.mk.library.repository.BookHistoryRepository;
 import mk.finki.ukim.mk.library.repository.BookRepository;
-import mk.finki.ukim.mk.library.service.domain.AuthorService;
 import mk.finki.ukim.mk.library.service.domain.BookService;
-import mk.finki.ukim.mk.library.service.domain.CountryService;
+import mk.finki.ukim.mk.library.service.domain.UserService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,9 +17,15 @@ import java.util.Optional;
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
+    private final BookHistoryRepository bookHistoryRepository;
+    private final UserService userService;
 
-    public BookServiceImpl(BookRepository bookRepository) {
+    public BookServiceImpl(BookRepository bookRepository,
+                           BookHistoryRepository bookHistoryRepository,
+                           UserService userService) {
         this.bookRepository = bookRepository;
+        this.bookHistoryRepository = bookHistoryRepository;
+        this.userService = userService;
     }
 
     @Override
@@ -34,13 +39,23 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public Optional<Book> save(Book book) {
-        return Optional.of(bookRepository.save(book));
+    @Transactional
+    public Optional<Book> save(Book book, String username) {
+        User user = userService.findByUsername(username);
+        Book savedBook = bookRepository.save(book);
+        BookHistory history = new BookHistory(savedBook, user);
+        bookHistoryRepository.save(history);
+        return Optional.of(savedBook);
     }
 
     @Override
-    public Optional<Book> update(Book book) {
-        return Optional.of(bookRepository.save(book));
+    @Transactional
+    public Optional<Book> update(Book book, String username) {
+        User user = userService.findByUsername(username);
+        Book savedBook = bookRepository.save(book);
+        BookHistory history = new BookHistory(savedBook, user);
+        bookHistoryRepository.save(history);
+        return Optional.of(savedBook);
     }
 
     @Override
@@ -49,6 +64,7 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
+    @Transactional
     public Optional<Book> markAsBorrowed(Long id) {
         return bookRepository.findById(id)
                 .map(book -> {
@@ -63,5 +79,12 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<Category> findAllCategories() {
         return Arrays.asList(Category.values());
+    }
+
+    @Override
+    public List<BookHistory> getBookHistory(Long bookId) {
+        return bookRepository.findById(bookId)
+                .map(bookHistoryRepository::findByBookOrderByModifiedAtDesc)
+                .orElse(List.of());
     }
 }
