@@ -33,6 +33,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @OneToOne(mappedBy = "user")
+    private Wishlist wishlist;
+
     private boolean isAccountNonExpired = true;
     private boolean isAccountNonLocked = true;
     private boolean isCredentialsNonExpired = true;

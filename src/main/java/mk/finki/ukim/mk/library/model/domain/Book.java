@@ -3,6 +3,8 @@ package mk.finki.ukim.mk.library.model.domain;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 @Entity
 public class Book {
@@ -20,6 +22,9 @@ public class Book {
     private Author author;
 
     private Integer availableCopies;
+
+    @ManyToMany(mappedBy = "books")
+    private List<Wishlist> wishlists;
 
     public Book() {
     }
