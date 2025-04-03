@@ -1,9 +1,9 @@
-package mk.finki.ukim.mk.library.service.Impl;
+package mk.finki.ukim.mk.library.service.domain.Impl;
 
 
-import mk.finki.ukim.mk.library.model.Country;
+import mk.finki.ukim.mk.library.model.domain.Country;
 import mk.finki.ukim.mk.library.repository.CountryRepository;
-import mk.finki.ukim.mk.library.service.CountryService;
+import mk.finki.ukim.mk.library.service.domain.CountryService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -30,22 +30,12 @@ public class CountryServiceImpl implements CountryService {
 
     @Override
     public Optional<Country> save(Country country) {
-//        country.setId(null);
         return Optional.of(countryRepository.save(country));
     }
 
     @Override
-    public Optional<Country> update(Long id, Country country) {
-        return countryRepository.findById(id)
-                .map(existingCountry -> {
-                    if (country.getName() != null) {
-                        existingCountry.setName(country.getName());
-                    }
-                    if (country.getContinent() != null) {
-                        existingCountry.setContinent(country.getContinent());
-                    }
-                    return countryRepository.save(existingCountry);
-                });
+    public Optional<Country> update(Country country) {
+        return Optional.of(countryRepository.save(country));
     }
 
     @Override

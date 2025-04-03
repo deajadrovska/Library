@@ -1,4 +1,4 @@
-package mk.finki.ukim.mk.library.model;
+package mk.finki.ukim.mk.library.model.domain;
 
 
 import jakarta.persistence.*;
@@ -27,9 +27,9 @@ public class Author {
         this.country = country;
     }
 
-//    public void setId(Long id) {
-//        Id = id;
-//    }
+    public void setId(Long id) {
+        Id = id;
+    }
 
     public void setName(String name) {
         this.name = name;
@@ -43,9 +43,9 @@ public class Author {
         this.country = country;
     }
 
-//    public Long getId() {
-//        return Id;
-//    }
+    public Long getId() {
+        return Id;
+    }
 
     public String getName() {
         return name;

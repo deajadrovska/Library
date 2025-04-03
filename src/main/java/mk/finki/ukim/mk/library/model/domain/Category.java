@@ -1,4 +1,4 @@
-package mk.finki.ukim.mk.library.model;
+package mk.finki.ukim.mk.library.model.domain;
 
 public enum Category {
     NOVEL,
