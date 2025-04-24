@@ -1,9 +1,9 @@
 package mk.finki.ukim.mk.library.service.domain.Impl;
 
-
 import mk.finki.ukim.mk.library.model.domain.*;
 import mk.finki.ukim.mk.library.repository.BookHistoryRepository;
 import mk.finki.ukim.mk.library.repository.BookRepository;
+import mk.finki.ukim.mk.library.repository.BooksByAuthorViewRepository;
 import mk.finki.ukim.mk.library.service.domain.BookService;
 import mk.finki.ukim.mk.library.service.domain.UserService;
 import org.springframework.stereotype.Service;
@@ -19,13 +19,16 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookHistoryRepository bookHistoryRepository;
     private final UserService userService;
+    private final BooksByAuthorViewRepository booksByAuthorViewRepository;
 
     public BookServiceImpl(BookRepository bookRepository,
                            BookHistoryRepository bookHistoryRepository,
-                           UserService userService) {
+                           UserService userService,
+                           BooksByAuthorViewRepository booksByAuthorViewRepository) {
         this.bookRepository = bookRepository;
         this.bookHistoryRepository = bookHistoryRepository;
         this.userService = userService;
+        this.booksByAuthorViewRepository = booksByAuthorViewRepository;
     }
 
     @Override
@@ -45,6 +48,7 @@ public class BookServiceImpl implements BookService {
         Book savedBook = bookRepository.save(book);
         BookHistory history = new BookHistory(savedBook, user);
         bookHistoryRepository.save(history);
+        this.refreshBooksByAuthorView();
         return Optional.of(savedBook);
     }
 
@@ -55,12 +59,15 @@ public class BookServiceImpl implements BookService {
         Book savedBook = bookRepository.save(book);
         BookHistory history = new BookHistory(savedBook, user);
         bookHistoryRepository.save(history);
+        this.refreshBooksByAuthorView();
         return Optional.of(savedBook);
     }
 
     @Override
+    @Transactional
     public void deleteById(Long id) {
         bookRepository.deleteById(id);
+        this.refreshBooksByAuthorView();
     }
 
     @Override
@@ -86,5 +93,10 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findById(bookId)
                 .map(bookHistoryRepository::findByBookOrderByModifiedAtDesc)
                 .orElse(List.of());
+    }
+
+    @Override
+    public void refreshBooksByAuthorView() {
+        booksByAuthorViewRepository.refreshMaterializedView();
     }
 }

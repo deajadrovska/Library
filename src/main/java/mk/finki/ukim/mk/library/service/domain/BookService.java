@@ -25,4 +25,6 @@ public interface BookService {
 
     //for the bookgistory addition
     List<BookHistory> getBookHistory(Long bookId);
+
+    void refreshBooksByAuthorView();
 }

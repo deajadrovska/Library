@@ -1,15 +1,18 @@
 version: "3"
 
 services:
-  wp-db:
-    image: "postgres"
-    container_name: "Library"
+  db:
+    image: postgres:17.4
+    restart: always
     environment:
-      - POSTGRES_USER=wp
-      - POSTGRES_PASSWORD=wp123
-      - POSTGRES_DB=library
-    ports:
-      #      prvoto go menjas
-      - "5430:5432"
+      POSTGRES_USER: emt
+      POSTGRES_PASSWORD: emt
+      POSTGRES_DB: emt_library
     volumes:
-      - ./postgres-data:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./views.sql:/docker-entrypoint-initdb.d/views.sql
+    ports:
+      - 5555:5432
+volumes:
+  pgdata:

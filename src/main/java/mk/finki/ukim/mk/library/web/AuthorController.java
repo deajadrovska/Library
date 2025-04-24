@@ -5,7 +5,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import mk.finki.ukim.mk.library.model.Dto.CreateAuthorDto;
 import mk.finki.ukim.mk.library.model.Dto.DisplayAuthorDto;
+import mk.finki.ukim.mk.library.model.projections.AuthorNameProjection;
+import mk.finki.ukim.mk.library.model.views.AuthorsByCountryView;
+import mk.finki.ukim.mk.library.repository.AuthorRepository;
+import mk.finki.ukim.mk.library.repository.AuthorsByCountryViewRepository;
 import mk.finki.ukim.mk.library.service.application.AuthorApplicationService;
+import mk.finki.ukim.mk.library.service.domain.AuthorService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,9 +22,15 @@ import java.util.List;
 public class AuthorController {
 
     private final AuthorApplicationService authorService;
+    private final AuthorsByCountryViewRepository authorsByCountryViewRepository;
+    private final AuthorRepository authorRepository;
+    private final AuthorService authorDomainService;
 
-    public AuthorController(AuthorApplicationService authorService) {
+    public AuthorController(AuthorApplicationService authorService, AuthorsByCountryViewRepository authorsByCountryViewRepository, AuthorRepository authorRepository, AuthorService authorDomainService) {
         this.authorService = authorService;
+        this.authorsByCountryViewRepository = authorsByCountryViewRepository;
+        this.authorRepository = authorRepository;
+        this.authorDomainService = authorDomainService;
     }
 
     @GetMapping
@@ -69,5 +80,19 @@ public class AuthorController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/by-country")
+    @Operation(summary = "Get authors count by country",
+            description = "Returns the number of authors for each country from a materialized view that refreshes on author changes")
+    public ResponseEntity<List<AuthorsByCountryView>> getAuthorsCountByCountry() {
+        return ResponseEntity.ok(authorsByCountryViewRepository.findAll());
+    }
+
+    @GetMapping("/names")
+    @Operation(summary = "Get all author names",
+            description = "Returns names and surnames of all authors using projection")
+    public ResponseEntity<List<AuthorNameProjection>> getAuthorNames() {
+        return ResponseEntity.ok(authorDomainService.getAllAuthorNames());
     }
 }

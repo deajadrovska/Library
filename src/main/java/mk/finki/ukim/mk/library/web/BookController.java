@@ -8,6 +8,8 @@ import mk.finki.ukim.mk.library.model.Dto.CreateBookDto;
 import mk.finki.ukim.mk.library.model.Dto.DisplayBookDto;
 import mk.finki.ukim.mk.library.model.Dto.DisplayBookHistoryDto;
 import mk.finki.ukim.mk.library.model.domain.Category;
+import mk.finki.ukim.mk.library.model.views.BooksByAuthorView;
+import mk.finki.ukim.mk.library.repository.BooksByAuthorViewRepository;
 import mk.finki.ukim.mk.library.service.application.BookApplicationService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -22,9 +24,11 @@ import java.util.List;
 public class BookController {
 
     private final BookApplicationService bookService;
+    private final BooksByAuthorViewRepository booksByAuthorViewRepository;
 
-    public BookController(BookApplicationService bookService) {
+    public BookController(BookApplicationService bookService, BooksByAuthorViewRepository booksByAuthorViewRepository) {
         this.bookService = bookService;
+        this.booksByAuthorViewRepository = booksByAuthorViewRepository;
     }
 
     @GetMapping
@@ -96,5 +100,12 @@ public class BookController {
             return ResponseEntity.ok(bookService.getBookHistory(id));
         }
         return ResponseEntity.notFound().build();
+    }
+
+    @GetMapping("/by-author")
+    @Operation(summary = "Get books count by author",
+            description = "Returns the number of books for each author from a materialized view that refreshes hourly")
+    public ResponseEntity<List<BooksByAuthorView>> getBooksCountByAuthor() {
+        return ResponseEntity.ok(booksByAuthorViewRepository.findAll());
     }
 }

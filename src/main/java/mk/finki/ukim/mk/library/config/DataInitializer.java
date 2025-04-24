@@ -1,6 +1,8 @@
 package mk.finki.ukim.mk.library.config;
 
 import jakarta.annotation.PostConstruct;
+import mk.finki.ukim.mk.library.model.domain.Author;
+import mk.finki.ukim.mk.library.model.domain.Country;
 import mk.finki.ukim.mk.library.model.domain.User;
 import mk.finki.ukim.mk.library.repository.AuthorRepository;
 import mk.finki.ukim.mk.library.repository.BookRepository;
@@ -33,8 +35,11 @@ public class DataInitializer {
         this.passwordEncoder = passwordEncoder;
     }
 
-    @PostConstruct
+//    @PostConstruct
     public void init() {
+        countryRepository.save(new Country("MKD", "EUROPE"));
+        countryRepository.save(new Country("UK", "EUROPE"));
+
 
 
         userRepository.save(new User(
