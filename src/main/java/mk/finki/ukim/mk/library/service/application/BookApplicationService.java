@@ -11,8 +11,8 @@ import java.util.Optional;
 public interface BookApplicationService {
     List<DisplayBookDto> findAll();
     Optional<DisplayBookDto> findById(Long id);
-    Optional<DisplayBookDto> save(CreateBookDto bookDto, String username);
-    Optional<DisplayBookDto> update(Long id, CreateBookDto bookDto, String username);
+    Optional<DisplayBookDto> save(CreateBookDto bookDto);
+    Optional<DisplayBookDto> update(Long id, CreateBookDto bookDto);
     void deleteById(Long id);
     Optional<DisplayBookDto> markAsBorrowed(Long id);
     List<Category> findAllCategories();

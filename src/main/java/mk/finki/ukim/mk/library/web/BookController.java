@@ -48,8 +48,9 @@ public class BookController {
     @PostMapping("/add")
     @PreAuthorize("hasRole('ROLE_LIBRARIAN')")
     @Operation(summary = "Add a new book", description = "Adds a new book to the library")
-    public ResponseEntity<DisplayBookDto> save(@RequestBody CreateBookDto bookDto, Principal principal) {
-        return bookService.save(bookDto, principal.getName())
+    public ResponseEntity<DisplayBookDto> save(@RequestBody CreateBookDto bookDto) {
+        // Remove Principal parameter
+        return bookService.save(bookDto)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
@@ -57,8 +58,9 @@ public class BookController {
     @PutMapping("/edit/{id}")
     @PreAuthorize("hasRole('ROLE_LIBRARIAN')")
     @Operation(summary = "Edit a book", description = "Updates an existing book's information")
-    public ResponseEntity<DisplayBookDto> update(@PathVariable Long id, @RequestBody CreateBookDto bookDto, Principal principal) {
-        return bookService.update(id, bookDto, principal.getName())
+    public ResponseEntity<DisplayBookDto> update(@PathVariable Long id, @RequestBody CreateBookDto bookDto) {
+        // Remove Principal parameter
+        return bookService.update(id, bookDto)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

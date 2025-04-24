@@ -1,5 +1,6 @@
 package mk.finki.ukim.mk.library.service.domain.Impl;
 
+import mk.finki.ukim.mk.library.config.UserContext;
 import mk.finki.ukim.mk.library.model.domain.*;
 import mk.finki.ukim.mk.library.repository.BookHistoryRepository;
 import mk.finki.ukim.mk.library.repository.BookRepository;
@@ -20,15 +21,17 @@ public class BookServiceImpl implements BookService {
     private final BookHistoryRepository bookHistoryRepository;
     private final UserService userService;
     private final BooksByAuthorViewRepository booksByAuthorViewRepository;
+    private final UserContext userContext;
 
     public BookServiceImpl(BookRepository bookRepository,
                            BookHistoryRepository bookHistoryRepository,
                            UserService userService,
-                           BooksByAuthorViewRepository booksByAuthorViewRepository) {
+                           BooksByAuthorViewRepository booksByAuthorViewRepository, UserContext userContext) {
         this.bookRepository = bookRepository;
         this.bookHistoryRepository = bookHistoryRepository;
         this.userService = userService;
         this.booksByAuthorViewRepository = booksByAuthorViewRepository;
+        this.userContext = userContext;
     }
 
     @Override
@@ -45,6 +48,7 @@ public class BookServiceImpl implements BookService {
     @Transactional
     public Optional<Book> save(Book book, String username) {
         User user = userService.findByUsername(username);
+//        User user = userContext.getCurrentUser();
         Book savedBook = bookRepository.save(book);
         BookHistory history = new BookHistory(savedBook, user);
         bookHistoryRepository.save(history);
@@ -56,6 +60,7 @@ public class BookServiceImpl implements BookService {
     @Transactional
     public Optional<Book> update(Book book, String username) {
         User user = userService.findByUsername(username);
+//        User user = userContext.getCurrentUser();
         Book savedBook = bookRepository.save(book);
         BookHistory history = new BookHistory(savedBook, user);
         bookHistoryRepository.save(history);
