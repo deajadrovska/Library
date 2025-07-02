@@ -46,7 +46,7 @@ public class BookController {
     }
 
     @PostMapping("/add")
-    @PreAuthorize("hasRole('ROLE_LIBRARIAN')")
+//    @PreAuthorize("hasRole('ROLE_LIBRARIAN')")
     @Operation(summary = "Add a new book", description = "Adds a new book to the library")
     public ResponseEntity<DisplayBookDto> save(@RequestBody CreateBookDto bookDto) {
         // Remove Principal parameter
@@ -56,7 +56,7 @@ public class BookController {
     }
 
     @PutMapping("/edit/{id}")
-    @PreAuthorize("hasRole('ROLE_LIBRARIAN')")
+//    @PreAuthorize("hasRole('ROLE_LIBRARIAN')")
     @Operation(summary = "Edit a book", description = "Updates an existing book's information")
     public ResponseEntity<DisplayBookDto> update(@PathVariable Long id, @RequestBody CreateBookDto bookDto) {
         // Remove Principal parameter
@@ -66,7 +66,7 @@ public class BookController {
     }
 
     @DeleteMapping("/delete/{id}")
-    @PreAuthorize("hasRole('ROLE_LIBRARIAN')")
+//    @PreAuthorize("hasRole('ROLE_LIBRARIAN')")
     @Operation(summary = "Delete a book", description = "Removes a book from the library")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         if (bookService.findById(id).isPresent()) {
@@ -77,7 +77,7 @@ public class BookController {
     }
 
     @PutMapping("/{id}/mark-as-borrowed")
-    @PreAuthorize("hasRole('ROLE_LIBRARIAN')")
+//    @PreAuthorize("hasRole('ROLE_LIBRARIAN')")
     @Operation(summary = "Mark book as borrowed", description = "Decreases the available copies count by 1")
     public ResponseEntity<DisplayBookDto> markAsBorrowed(@PathVariable Long id) {
         return bookService.markAsBorrowed(id)

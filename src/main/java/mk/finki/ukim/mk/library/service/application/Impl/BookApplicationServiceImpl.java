@@ -48,7 +48,8 @@ public class BookApplicationServiceImpl implements BookApplicationService {
         return authorService.findById(bookDto.authorId())
                 .map(author -> {
                     Book book = bookDto.toBook(author);
-                    return bookService.save(book, username);
+//                    return bookService.save(book, username);
+                    return bookService.save(book, "dj");
                 })
                 .orElse(Optional.empty())
                 .map(DisplayBookDto::from);
@@ -63,7 +64,8 @@ public class BookApplicationServiceImpl implements BookApplicationService {
                         .map(author -> {
                             Book book = bookDto.toBook(author);
                             book.setId(id);
-                            return bookService.update(book, username);
+//                            return bookService.update(book, username);
+                            return bookService.save(book, "dj");
                         })
                         .orElse(Optional.empty())
                 )

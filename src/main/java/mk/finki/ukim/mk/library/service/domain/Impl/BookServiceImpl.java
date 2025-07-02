@@ -71,6 +71,7 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional
     public void deleteById(Long id) {
+        bookHistoryRepository.deleteByBookId(id);
         bookRepository.deleteById(id);
         this.refreshBooksByAuthorView();
     }
