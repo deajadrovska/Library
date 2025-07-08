@@ -96,7 +96,7 @@ public class WishlistServiceImpl implements WishlistService {
                             throw new RuntimeException("Not enough copies available for book: " + book.getName());
                         }
                     }
-//                    wishlist.setStatus(WishlistStatus.BORROWED);
+                    wishlist.setStatus(WishlistStatus.BORROWED);
                     wishlist.getBooks().clear();
                     return wishlistRepository.save(wishlist);
                 });

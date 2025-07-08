@@ -7,6 +7,7 @@ import mk.finki.ukim.mk.library.repository.BookRepository;
 import mk.finki.ukim.mk.library.repository.BooksByAuthorViewRepository;
 import mk.finki.ukim.mk.library.service.domain.BookService;
 import mk.finki.ukim.mk.library.service.domain.UserService;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,16 +23,20 @@ public class BookServiceImpl implements BookService {
     private final UserService userService;
     private final BooksByAuthorViewRepository booksByAuthorViewRepository;
     private final UserContext userContext;
+    private final Environment environment;
 
     public BookServiceImpl(BookRepository bookRepository,
                            BookHistoryRepository bookHistoryRepository,
                            UserService userService,
-                           BooksByAuthorViewRepository booksByAuthorViewRepository, UserContext userContext) {
+                           BooksByAuthorViewRepository booksByAuthorViewRepository,
+                           UserContext userContext,
+                           Environment environment) {
         this.bookRepository = bookRepository;
         this.bookHistoryRepository = bookHistoryRepository;
         this.userService = userService;
         this.booksByAuthorViewRepository = booksByAuthorViewRepository;
         this.userContext = userContext;
+        this.environment = environment;
     }
 
     @Override
@@ -103,6 +108,19 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public void refreshBooksByAuthorView() {
-        booksByAuthorViewRepository.refreshMaterializedView();
+        // Only refresh materialized view in PostgreSQL production environment
+        // H2 test environment uses regular views that auto-update
+        boolean isTestProfile = environment.acceptsProfiles("test");
+
+        if (!isTestProfile) {
+            // Production PostgreSQL environment - refresh materialized view
+            try {
+                booksByAuthorViewRepository.refreshMaterializedViewPostgreSQL();
+            } catch (Exception e) {
+                // Log error but don't fail the operation
+                System.err.println("Warning: Could not refresh materialized view: " + e.getMessage());
+            }
+        }
+        // For test environment (H2), do nothing as regular views auto-update
     }
 }
