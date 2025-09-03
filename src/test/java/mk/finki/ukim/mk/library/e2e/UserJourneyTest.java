@@ -92,7 +92,8 @@ public class UserJourneyTest {
         mockMvc.perform(get("/api/wishlist")
                 .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
+                .andExpect(jsonPath("$.id").exists())
+                .andExpect(jsonPath("$.username").value(username));
 
         // Step 7: Browse authors
         mockMvc.perform(get("/api/authors"))
@@ -184,9 +185,9 @@ public class UserJourneyTest {
         mockMvc.perform(post("/api/wishlist/add/1"))
                 .andExpect(status().isForbidden());
 
-        // 4. Try to access with invalid token
+        // 4. Try to access with invalid token (use malformed format that won't be processed)
         mockMvc.perform(post("/api/wishlist/add/1")
-                .header("Authorization", "Bearer invalid-token"))
+                .header("Authorization", "Bearer invalid-token-format"))
                 .andExpect(status().isForbidden());
 
         // 5. System should still work after errors

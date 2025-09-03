@@ -62,8 +62,8 @@ public class JwtFilter extends OncePerRequestFilter {
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
             }
-        } catch (JwtException jwtException) {
-            // TODO: Add logic for exception handling.
+        } catch (Exception e) {
+            // Invalid token or user not found, continue without authentication
         }
 
         filterChain.doFilter(request, response);
