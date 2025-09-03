@@ -7,7 +7,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import mk.finki.ukim.mk.library.exceptions.InvalidArgumentsException;
 import mk.finki.ukim.mk.library.exceptions.InvalidUserCredentialsException;
+import mk.finki.ukim.mk.library.exceptions.InvalidUsernameOrPasswordException;
 import mk.finki.ukim.mk.library.exceptions.PasswordsDoNotMatchException;
+import mk.finki.ukim.mk.library.exceptions.UserNotFoundException;
+import mk.finki.ukim.mk.library.exceptions.UsernameAlreadyExistsException;
 import mk.finki.ukim.mk.library.model.Dto.CreateUserDto;
 import mk.finki.ukim.mk.library.model.Dto.DisplayUserDto;
 import mk.finki.ukim.mk.library.model.Dto.LoginResponseDto;
@@ -42,7 +45,7 @@ public class UserController {
             return userApplicationService.register(createUserDto)
                     .map(ResponseEntity::ok)
                     .orElse(ResponseEntity.notFound().build());
-        } catch (InvalidArgumentsException | PasswordsDoNotMatchException exception) {
+        } catch (InvalidUsernameOrPasswordException | PasswordsDoNotMatchException | UsernameAlreadyExistsException exception) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -60,7 +63,7 @@ public class UserController {
             return userApplicationService.login(loginUserDto)
                     .map(ResponseEntity::ok)
                     .orElseThrow(InvalidUserCredentialsException::new);
-        } catch (InvalidUserCredentialsException e) {
+        } catch (InvalidArgumentsException | UserNotFoundException | InvalidUserCredentialsException e) {
             return ResponseEntity.notFound().build();
         }
     }

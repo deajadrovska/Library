@@ -8,6 +8,7 @@ import mk.finki.ukim.mk.library.model.domain.User;
 import mk.finki.ukim.mk.library.security.JwtHelper;
 import mk.finki.ukim.mk.library.service.application.UserApplicationService;
 import mk.finki.ukim.mk.library.service.domain.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -16,11 +17,12 @@ import java.util.Optional;
 public class UserApplicationServiceImpl implements UserApplicationService {
 
     private final UserService userService;
-    private final JwtHelper jwtHelper;
 
-    public UserApplicationServiceImpl(UserService userService, JwtHelper jwtHelper) {
+    @Autowired(required = false)
+    private JwtHelper jwtHelper;
+
+    public UserApplicationServiceImpl(UserService userService) {
         this.userService = userService;
-        this.jwtHelper = jwtHelper;
     }
 
     @Override
@@ -42,6 +44,10 @@ public class UserApplicationServiceImpl implements UserApplicationService {
                 loginUserDto.username(),
                 loginUserDto.password()
         );
+
+        if (jwtHelper == null) {
+            throw new RuntimeException("JWT Helper not available");
+        }
 
         String token = jwtHelper.generateToken(user);
 

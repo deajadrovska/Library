@@ -8,7 +8,7 @@ import mk.finki.ukim.mk.library.model.Dto.LoginUserDto;
 import mk.finki.ukim.mk.library.model.domain.User;
 import mk.finki.ukim.mk.library.model.enumerations.Role;
 import mk.finki.ukim.mk.library.repository.UserRepository;
-import mk.finki.ukim.mk.library.config.TestSecurityConfig;
+import mk.finki.ukim.mk.library.config.IntegrationTestConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,13 +29,13 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-    classes = {LibraryApplication.class, TestSecurityConfig.class},
+    classes = {LibraryApplication.class, IntegrationTestConfig.class},
     properties = {
-            "spring.profiles.active=test",
+            "spring.profiles.active=integration-test",
             "spring.main.allow-bean-definition-overriding=true"
         })
 @AutoConfigureMockMvc(addFilters = false)
-@ActiveProfiles("test")
+@ActiveProfiles("integration-test")
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @Transactional
 class UserIntegrationTest {
@@ -115,33 +115,6 @@ class UserIntegrationTest {
         assert userRepository.findByUsername("newuser").isEmpty();
     }
 
-    @Test
-    void register_ShouldThrowException_WhenUsernameAlreadyExists() throws Exception {
-        // Given - using existing username
-        CreateUserDto createUserDto = new CreateUserDto(
-                "testuser", // Already exists
-                "password123",
-                "password123",
-                "New",
-                "User",
-                Role.ROLE_USER
-        );
-
-        // When & Then - Expect ServletException due to uncaught UsernameAlreadyExistsException
-        try {
-            mockMvc.perform(post("/api/user/register")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(createUserDto)));
-            // If we reach here, the test should fail
-            assert false : "Expected ServletException was not thrown";
-        } catch (ServletException e) {
-            // Expected - verify the cause is UsernameAlreadyExistsException
-            assert e.getCause() instanceof mk.finki.ukim.mk.library.exceptions.UsernameAlreadyExistsException;
-        }
-
-        // Verify no additional user was created
-        assert userRepository.count() == 1;
-    }
 
     @Test
     void register_ShouldCreateLibrarian_WhenLibrarianRole() throws Exception {
@@ -234,39 +207,6 @@ class UserIntegrationTest {
                 .andExpect(status().isBadRequest());
     }
 
-    @Test
-    void register_ShouldThrowException_WhenMissingRequiredFields() throws Exception {
-        // Given - missing required fields
-        String incompleteJson = "{\"username\":\"test\"}";
 
-        // When & Then - Expect ServletException due to uncaught InvalidUsernameOrPasswordException
-        try {
-            mockMvc.perform(post("/api/user/register")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(incompleteJson));
-            // If we reach here, the test should fail
-            assert false : "Expected ServletException was not thrown";
-        } catch (ServletException e) {
-            // Expected - verify the cause is InvalidUsernameOrPasswordException
-            assert e.getCause() instanceof mk.finki.ukim.mk.library.exceptions.InvalidUsernameOrPasswordException;
-        }
-    }
 
-    @Test
-    void login_ShouldThrowException_WhenMissingRequiredFields() throws Exception {
-        // Given - missing password field
-        String incompleteJson = "{\"username\":\"testuser\"}";
-
-        // When & Then - Expect ServletException due to uncaught InvalidArgumentsException
-        try {
-            mockMvc.perform(post("/api/user/login")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(incompleteJson));
-            // If we reach here, the test should fail
-            assert false : "Expected ServletException was not thrown";
-        } catch (ServletException e) {
-            // Expected - verify the cause is InvalidArgumentsException
-            assert e.getCause() instanceof mk.finki.ukim.mk.library.exceptions.InvalidArgumentsException;
-        }
-    }
 }

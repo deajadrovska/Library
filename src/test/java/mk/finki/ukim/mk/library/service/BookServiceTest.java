@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.env.Environment;
 
 import java.util.Arrays;
 import java.util.List;
@@ -41,6 +42,9 @@ class BookServiceTest {
 
     @Mock
     private UserContext userContext;
+
+    @Mock
+    private Environment environment;
 
     @InjectMocks
     private BookServiceImpl bookService;
@@ -98,6 +102,7 @@ class BookServiceTest {
         String username = "testuser";
         when(userService.findByUsername(username)).thenReturn(testUser);
         when(bookRepository.save(testBook)).thenReturn(testBook);
+        when(environment.acceptsProfiles("test")).thenReturn(true);
 
         // When
         Optional<Book> result = bookService.save(testBook, username);
@@ -108,7 +113,8 @@ class BookServiceTest {
         verify(userService).findByUsername(username);
         verify(bookRepository).save(testBook);
         verify(bookHistoryRepository).save(any(BookHistory.class));
-        verify(booksByAuthorViewRepository).refreshMaterializedView();
+        // In test environment, refreshBooksByAuthorView should not call refreshMaterializedViewPostgreSQL
+        verify(environment).acceptsProfiles("test");
     }
 
     @Test

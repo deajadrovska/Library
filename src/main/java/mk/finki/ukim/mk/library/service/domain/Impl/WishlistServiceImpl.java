@@ -48,8 +48,14 @@ public class WishlistServiceImpl implements WishlistService {
             throw new RuntimeException("User not found");
         }
 
-        return wishlistRepository.findByUserAndStatus(user, WishlistStatus.CREATED)
-                .or(() -> createWishlist(user));
+        // First, try to find existing wishlist
+        Optional<Wishlist> existingWishlist = wishlistRepository.findByUserAndStatus(user, WishlistStatus.CREATED);
+        if (existingWishlist.isPresent()) {
+            return existingWishlist;
+        }
+
+        // If no wishlist exists, try to create one with retry logic for constraint violations
+        return createWishlistWithRetry(user);
     }
 
     @Override
@@ -103,9 +109,47 @@ public class WishlistServiceImpl implements WishlistService {
     }
 
     @Override
+    @Transactional
     public Optional<Wishlist> createWishlist(User user) {
         Wishlist wishlist = new Wishlist(user);
         return Optional.of(wishlistRepository.save(wishlist));
+    }
+
+    /**
+     * Creates a wishlist with retry logic to handle constraint violations
+     * that can occur during concurrent access.
+     */
+    private Optional<Wishlist> createWishlistWithRetry(User user) {
+        int maxRetries = 3;
+        for (int attempt = 0; attempt < maxRetries; attempt++) {
+            try {
+                return createWishlist(user);
+            } catch (Exception e) {
+                // Check if it's a constraint violation
+                if (e.getMessage() != null && e.getMessage().contains("Unique index or primary key violation")) {
+                    // Another thread might have created the wishlist, try to find it
+                    Optional<Wishlist> existingWishlist = wishlistRepository.findByUserAndStatus(user, WishlistStatus.CREATED);
+                    if (existingWishlist.isPresent()) {
+                        return existingWishlist;
+                    }
+
+                    // If not found and we have retries left, wait a bit and try again
+                    if (attempt < maxRetries - 1) {
+                        try {
+                            Thread.sleep(10); // Small delay before retry
+                        } catch (InterruptedException ie) {
+                            Thread.currentThread().interrupt();
+                            throw new RuntimeException("Interrupted while waiting to retry wishlist creation", ie);
+                        }
+                        continue;
+                    }
+                }
+                // If it's not a constraint violation or we've exhausted retries, re-throw
+                throw new RuntimeException("Failed to create wishlist after " + maxRetries + " attempts", e);
+            }
+        }
+        // This should never be reached, but just in case
+        throw new RuntimeException("Failed to create wishlist after " + maxRetries + " attempts");
     }
 
     @Override

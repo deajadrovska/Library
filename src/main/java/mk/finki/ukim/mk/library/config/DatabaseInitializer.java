@@ -21,7 +21,7 @@ public class DatabaseInitializer implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         try {
-            boolean isTestProfile = environment.acceptsProfiles("test");
+            boolean isTestProfile = environment.acceptsProfiles("test", "integration-test");
 
             if (isTestProfile) {
                 // For H2 test database, use regular views without PostgreSQL-specific features

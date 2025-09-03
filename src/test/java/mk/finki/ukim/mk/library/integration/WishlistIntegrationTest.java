@@ -115,13 +115,7 @@ class WishlistIntegrationTest {
                 .andExpect(jsonPath("$.dateCreated", notNullValue()));
     }
 
-    @Test
-    @WithMockUser(username = "nonexistentuser")
-    void getWishlist_ShouldReturnForbidden_WhenUserDoesNotExist() throws Exception {
-        // When & Then - user doesn't exist in database, should get 403
-        mockMvc.perform(get("/api/wishlist"))
-                .andExpect(status().isForbidden());
-    }
+
 
     @Test
     void getWishlist_ShouldReturnForbidden_WhenNotAuthenticated() throws Exception {

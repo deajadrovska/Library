@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -35,6 +36,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User register(
             String username,
             String password,
@@ -49,7 +51,11 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByUsername(username).isPresent())
             throw new UsernameAlreadyExistsException(username);
         User user = new User(username, passwordEncoder.encode(password), name, surname, userRole);
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        if (savedUser == null) {
+            throw new RuntimeException("Failed to save user");
+        }
+        return savedUser;
     }
 
     @Override

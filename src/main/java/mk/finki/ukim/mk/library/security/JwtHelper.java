@@ -19,8 +19,19 @@ import java.util.function.Function;
 public class JwtHelper {
 
     private Key getSignIn() {
-        byte[] keyBytes = Decoders.BASE64.decode(JwtConstants.SECRET_KEY);
+        // Convert hex string to bytes
+        byte[] keyBytes = hexStringToByteArray(JwtConstants.SECRET_KEY);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    private byte[] hexStringToByteArray(String hex) {
+        int len = hex.length();
+        byte[] data = new byte[len / 2];
+        for (int i = 0; i < len; i += 2) {
+            data[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4)
+                    + Character.digit(hex.charAt(i + 1), 16));
+        }
+        return data;
     }
 
     private Claims extractAllClaims(String token) {
@@ -71,8 +82,12 @@ public class JwtHelper {
     }
 
     public boolean isValid(String token, UserDetails userDetails) {
-        String username = extractUsername(token);
-        return !isExpired(token) && username.equals(userDetails.getUsername());
+        try {
+            String username = extractUsername(token);
+            return !isExpired(token) && username.equals(userDetails.getUsername());
+        } catch (JwtException e) {
+            return false;
+        }
     }
 
 }
